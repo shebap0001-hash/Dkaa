@@ -4,17 +4,97 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SHE Daily Inspection System</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+    <script>
+        const STORAGE_KEY = 'bap_she_logs_v2';
+        let inspectionLogs = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+
+        function saveLogs() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(inspectionLogs));
+        }
+
+        function addLog(log) {
+            inspectionLogs.push(log);
+            saveLogs();
+            renderLogs();
+            showToast('Log added successfully!');
+        }
+
+        function renderLogs() {
+            const tableBody = document.getElementById('logTableBody');
+            tableBody.innerHTML = '';
+            inspectionLogs.forEach((log, index) => {
+                const row = `<tr>
+                    <td>${log.date}</td>
+                    <td>${log.department}</td>
+                    <td>${log.location}</td>
+                    <td>${log.findings}</td>
+                    <td>${log.improvements}</td>
+                    <td><img src="${log.image}" class="w-16 h-16" alt="Uploaded Image"></td>
+                    <td><button onclick='deleteLog(${index})'>Delete</button></td>
+                </tr>`;
+                tableBody.innerHTML += row;
+            });
+        }
+
+        function deleteLog(index) {
+            inspectionLogs.splice(index, 1);
+            saveLogs();
+            renderLogs();
+            showToast('Log deleted successfully!');
+        }
+
+        function exportToExcel() {
+            const ws = XLSX.utils.json_to_sheet(inspectionLogs);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Inspection Logs');
+            XLSX.writeFile(wb, 'inspection_logs.xlsx');
+            showToast('Exported to Excel!');
+        }
+
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.innerText = message;
+            toast.className = 'fixed bottom-5 right-5 bg-green-500 text-white p-3 rounded';
+            document.body.appendChild(toast);
+            setTimeout(() => { document.body.removeChild(toast); }, 3000);
+        }
+
+        document.addEventListener('DOMContentLoaded', renderLogs);
+    </script>
 </head>
-<body>
-    <h1>Welcome to the SHE Daily Inspection System</h1>
-    <form id="inspection-form">
-        <label for="date">Date:</label>
-        <input type="date" id="date" name="date" required>
-        <label for="inspector">Inspector Name:</label>
-        <input type="text" id="inspector" name="inspector" required>
-        <label for="comments">Comments:</label>
-        <textarea id="comments" name="comments"></textarea>
-        <button type="submit">Submit</button>
-    </form>
+<body class="bg-gray-100">
+    <header class="bg-blue-500 text-white p-4">
+        <h1 class="text-xl">SHE Daily Inspection System</h1>
+    </header>
+    <main class="p-4">
+        <form id="inspectionForm" class="bg-white p-4 rounded shadow">
+            <h2 class="font-bold text-lg mb-4">Inspection Form</h2>
+            <input type="date" id="date" required class="border p-2">
+            <input type="text" id="department" placeholder="Department" required class="border p-2 mt-2">
+            <input type="text" id="location" placeholder="Location" required class="border p-2 mt-2">
+            <textarea id="findings" placeholder="Findings" required class="border p-2 mt-2"></textarea>
+            <textarea id="improvements" placeholder="Improvements" required class="border p-2 mt-2"></textarea>
+            <input type="file" id="imageUpload" class="border p-2 mt-2" accept="image/*">
+            <button type="button" onclick="submitForm()" class="bg-blue-500 text-white p-2 mt-2">Submit</button>
+        </form>
+        <h2 class="font-bold text-lg mt-8">Inspection History</h2>
+        <table class="min-w-full bg-white shadow rounded">
+            <thead>
+                <tr class="bg-gray-800 text-white">
+                    <th>Date</th>
+                    <th>Department</th>
+                    <th>Location</th>
+                    <th>Findings</th>
+                    <th>Improvements</th>
+                    <th>Image</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="logTableBody"></tbody>
+        </table>
+        <button onclick="exportToExcel()" class="bg-green-500 text-white p-2 mt-4">Export to Excel</button>
+    </main>
 </body>
 </html>
