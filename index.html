@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SHE Daily Inspection System</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <header>
+        <h1>SHE Daily Inspection System</h1>
+    </header>
+    <form id="inspectionForm">
+        <fieldset>
+            <legend>Inspection Details</legend>
+            <label for="department">Department:</label>
+            <select id="department" name="department" required>
+                <option value="HR">HR</option>
+                <option value="IT">IT</option>
+                <option value="Facilities">Facilities</option>
+                <option value="Safety">Safety</option>
+            </select>
+            <br>
+            <label for="date">Date:</label>
+            <input type="date" id="date" name="date" required>
+            <br>
+            <label for="inspector">Inspector Name:</label>
+            <input type="text" id="inspector" name="inspector" required>
+            <br>
+            <label for="imageUpload">Upload Image:</label>
+            <input type="file" id="imageUpload" name="imageUpload" accept="image/*" required>
+            <br>
+            <button type="submit">Submit</button>
+        </fieldset>
+    </form>
+    <footer>
+        <p>&copy; 2026 SHE Daily Inspection System</p>
+    </footer>
+</body>
+</html>
